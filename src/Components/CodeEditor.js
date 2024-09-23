@@ -9,19 +9,18 @@ import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 const languages = [
   { name: "JavaScript", value: "javascript" },
-  { name: "Python", value: "python" },
+  // { name: "Python", value: "python" },
 ];
 
-const CodeEditor = () => {
-  const [code, setCode] = useState(
-    '// Write your JavaScript code here\nconsole.log("Hello, World!");'
-  );
+const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
+  const [code, setCode] = useState(codesnippet);
   const [language, setLanguage] = useState("javascript");
   const [output, setOutput] = useState("");
   const editorRef = useRef();
 
   const onChange = (value) => {
     setCode(value);
+    setcompiledcode(value)
   };
 
   const getLanguageExtension = () => {
@@ -35,9 +34,9 @@ const CodeEditor = () => {
     }
   };
 
-  const { setContainer } = useCodeMirror({
+  const { setContainer, view } = useCodeMirror({
     container: editorRef.current,
-    value: code,
+    value: code?.replace(/\\n/g, '\n'), // Convert `\n` to actual newlines
     extensions: getLanguageExtension(),
     theme: dracula,
     onChange: onChange,
@@ -49,25 +48,23 @@ const CodeEditor = () => {
     }
   }, [editorRef.current]);
 
-  const runCode = () => {
-    try {
-      if (language === "javascript") {
-        const output = [];
-        const originalLog = console.log;
-
-        console.log = (message) => {
-          output.push(message);
-        };
-
-        new Function(code)();
-        console.log = originalLog;
-        setOutput(output.join("\n"));
-      } else if (language === "python") {
-        setOutput("Python execution not implemented.");
-      }
-    } catch (error) {
-      setOutput(`Error: ${error.message}`);
+  useEffect(() => {
+    if (view) {
+      const defaultCode =
+        language === "javascript"
+          ? codesnippet?.replace(/\\n/g, '\n') // Convert `\n` to newlines
+          : '# Write your Python code here\nprint("Hello, World!")';
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: defaultCode },
+      });
     }
+  }, [language, view, codesnippet]);
+
+  const runCode = async() => {
+   
+      setcompiledcode(codesnippet)
+    await Runsampletestcases()
+  
   };
 
   return (
@@ -77,13 +74,11 @@ const CodeEditor = () => {
           value={language}
           onChange={(e) => {
             setLanguage(e.target.value);
-            if (e.target.value === "javascript") {
-              setCode(
-                '// Write your JavaScript code here\nconsole.log("Hello, World!");'
-              );
-            } else if (e.target.value === "python") {
-              setCode('# Write your Python code here\nprint("Hello, World!")');
-            }
+            setCode(
+              e.target.value === "javascript"
+                ? codesnippet?.replace(/\\n/g, '\n') // Convert `\n` to newlines for JS
+                : '# Write your Python code here\nprint("Hello, World!")'
+            );
           }}
           className="ml-2 p-1 rounded"
         >
@@ -95,7 +90,7 @@ const CodeEditor = () => {
         </select>
         <button
           onClick={runCode}
-          className="flex items-center p-2  rounded-lg bg-white mt-2 mr-2 text-black "
+          className="flex items-center p-2 rounded-lg bg-white mt-2 mr-2 text-black"
         >
           <FontAwesomeIcon icon={faPlay} className="" />
         </button>
@@ -108,10 +103,7 @@ const CodeEditor = () => {
         ></div>
       </div>
 
-      {/* <div className="output-section mt-4 p-4 bg-gray-200 rounded">
-        <h3 className="text-lg font-semibold">Code Output:</h3>
-        <pre className="p-4 bg-gray-300 rounded">{output}</pre>
-      </div> */}
+      
     </div>
   );
 };
