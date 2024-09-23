@@ -1,5 +1,6 @@
 import React from "react";
 import { FaRegPlayCircle } from "react-icons/fa";
+import CodeEditor from "./CodeEditor";
 
 const CodinPateform = () => {
   return (
@@ -56,11 +57,11 @@ const CodinPateform = () => {
 
           {/* Right Section: 9 Columns */}
           <div className="col-span-12 lg:col-span-8">
-            <div className="border border-black pt-5 rounded-xl">
-              <div className="w-full h-12 px-10 bg-white rounded-lg flex justify-between">
+            <div className="border border-black  rounded-xl">
+              {/* <div className="w-full h-12 px-10 bg-white rounded-lg flex justify-between">
                 <select
                   className="bg-white flex justify-center pl-3 h-8 border-2 text-[#9D9D9D] w-[120px]
-               
+
                 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="option1">javascript</option>
@@ -73,10 +74,10 @@ const CodinPateform = () => {
                 <div className="flex flex-col justify-center pr-5">
                   <FaRegPlayCircle className="text-black h-8 mb-5  w-8 cursor-pointer" />
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-row basis-1/2grid  pb-0">
-                <div className="flex flex-col p-2 mt-4">
+                {/* <div className="flex flex-col p-2 mt-4">
                   <p>1.</p>
                   <p>2.</p>
                   <p>3.</p>
@@ -86,13 +87,14 @@ const CodinPateform = () => {
                   <p>7.</p>
                   <p>8.</p>
                   <p>9.</p>
-                </div>
-                <textarea
+                </div> */}
+                {/* <textarea
                   id="message"
                   rows="4"
                   className="block p-2.5 w-full h-[50vh] text-10  text-white bg-black rounded-br-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 mt-3 border-none"
                   placeholder="Write your thoughts here..."
-                ></textarea>
+                ></textarea> */}
+                <CodeEditor />
               </div>
             </div>
 
