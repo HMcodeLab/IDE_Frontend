@@ -1,1 +1,1 @@
-export const BASE_URL='https://ide.hopingminds.com'
+export const BASE_URL='https://ide.hopingminds.com/api'

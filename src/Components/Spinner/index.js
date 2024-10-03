@@ -1,13 +1,8 @@
-// SkeletonSpinner.js
-import React from 'react';
-import './spinner.css'; // Create a separate CSS file for styling
-
-const SkeletonSpinner = () => {
-  return (
-    <div className="skeleton-spinner">
-      <div className="spinner"></div>
+import './spinner.css'
+export default function Spinner(){
+    return(<>
+    <div className='h-full w-full flex justify-center items-center bg-transparent z-[99999999788]'>
+    <span className="loader "></span>
     </div>
-  );
-};
-
-export default SkeletonSpinner;
+    </>)
+}
