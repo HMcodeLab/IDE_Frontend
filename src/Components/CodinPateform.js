@@ -2,38 +2,62 @@ import React, { useEffect, useState } from "react";
 import { FaRegPlayCircle } from "react-icons/fa";
 import CodeEditor from "./CodeEditor";
 import { BASE_URL } from "./api";
-
+import { MdDone } from "react-icons/md";
+import { ImCross } from "react-icons/im";
+import { FaCirclePause } from "react-icons/fa6";
+import SkeletonSpinner from "./Spinner";
+import { Toaster } from "react-hot-toast";
 const CodinPateform = () => {
   const [allquestions, setallquestions] = useState([])
   const [currentindex, setcurrentindex] = useState(0)
   const [testcaseindex, settestcaseindex] = useState(0)
   const [output, setoutput] = useState([])
   const [compiledcode, setcompiledcode] = useState('')
-  
+  const [language, setlanguage] = useState('javascript')
+  const [show, setshow] = useState(false)
+  const [showSpinner, setshowSpinner] = useState(false)
+  const languageWiseApi={
+    'javascript':'runAllTestCaseForJS',
+    'cpp':'runAllCppTestCases',
+    'java':'runAllJavaTestCases',
+    'python':'runAllPythonTestCases',
+  }
+  const languageWisePayload={
+    'javascript':'jsCode',
+    'cpp':'cppCode',
+    'java':'javaCode',
+    'python':'pythonCode',
+  }
+let temp=true;
   useEffect(() => {
 async function Fetchdata() {
   try {
+    setshowSpinner(true)
     const data=await fetch(BASE_URL+'/api/allQues')
     const response=await data.json()
     setallquestions(response)
-    
+    setshowSpinner(false)
   } catch (error) {
     
   }
 }
-Fetchdata()
+if(temp){
+  Fetchdata()
+temp=false;
+}
   }, [])
   async function Runsampletestcases(){
     try {
-      const tempdata=await fetch(BASE_URL+'/api/runAllTestCaseForJS',{
+      console.log(language);
+      
+      const tempdata=await fetch(BASE_URL+'/api/'+languageWiseApi[language],{
         method:'POST',
         headers:{
           'Content-type':'application/json'
         },
         body:JSON.stringify({
           Id:allquestions[currentindex]?.Id,
-          testCase:1,
-          jsCode:compiledcode
+          code:compiledcode
         })
       })
       const response=await tempdata.json()
@@ -50,6 +74,9 @@ Fetchdata()
   }
   return (
     <>
+    {
+      showSpinner ? <SkeletonSpinner/>:
+    
       <div className="px-12">
         <h2 className="bg-[#0F2027] p-10 text-white taext mt-5 font-medium  rounded-2xl font-popping  sm:text-xl md:text-xl lg:text-xl xl:text-[23px]">
           Test Your Knowledge On Full Stack Development
@@ -68,7 +95,7 @@ Fetchdata()
                   <li>
                     {allquestions[currentindex]?.Ques}
                   </li>
-                  <li>Print the decimal value of each fraction.</li>
+                  {/* <li>Print the decimal value of each fraction.</li> */}
                 </ol>
 {
   allquestions[currentindex]?.sample_test_cases?.map((item,index)=>{
@@ -98,7 +125,7 @@ Fetchdata()
 
               <div className="flex flex-row basis-1/2grid  pb-0">
                
-                <CodeEditor Runsampletestcases={Runsampletestcases} setcompiledcode={setcompiledcode} codesnippet={allquestions[currentindex]?.initial_user_func?.javascript?.initial_code}/>
+                <CodeEditor show={show} setshow={setshow} language={language} setlanguage={setlanguage} Runsampletestcases={Runsampletestcases} setcompiledcode={setcompiledcode} codesnippet={allquestions[currentindex]?.initial_user_func[language]?.initial_code}/>
               </div>
             </div>
 
@@ -109,19 +136,19 @@ Fetchdata()
                 </h3>
 
                 <div>
-                  <div className="  align-iteam pb-0 block w-full h-[168px] text-sm text-white bg-black  border border-gray-300 focus:ring-blue-500 focus:border-blue-500 border-none outline-none  rounded-b-lg">
+                  <div className="  align-iteam pb-0 block w-full h-[200px] text-sm text-white bg-black  border border-gray-300 focus:ring-blue-500 focus:border-blue-500 border-none outline-none  rounded-b-lg">
                    {allquestions[currentindex]?.sample_test_cases?.map((item,index)=>{
                     return(<>
                      <button onClick={()=>settestcaseindex(index)} className={` ml-4 mt-2 hover:bg-sky-100 hover:text-black p-2 rounded ${testcaseindex==index ? 'bg-green-500 text-white':''}`}>
-                      case {index+1}
+                      Case {index+1}
                     </button>
                   
                     </>)
                    })
         }
                    
-                   <p className="mt-3 ml-3">input: {allquestions[currentindex]?.sample_test_cases[testcaseindex]?.input}</p>
-                   <p className=" mt-4 ml-3">output: {allquestions[currentindex]?.sample_test_cases[testcaseindex]?.expected_output}</p>
+                   <p className="mt-3 ml-3"> Input: {allquestions[currentindex]?.sample_test_cases[testcaseindex]?.input}</p>
+                   <p className=" mt-4 ml-3">Output: {allquestions[currentindex]?.sample_test_cases[testcaseindex]?.expected_output}</p>
                     
                   </div>
                   {/* <textarea
@@ -143,12 +170,11 @@ Fetchdata()
                   className="block w-full h-[216px] text-sm text-white bg-black  border border-gray-300 focus:ring-blue-500 focus:border-blue-500 border-none outline-none  rounded-b-lg"
                   placeholder="Write your thoughts here..."
                 ></textarea> */}
-                <div className="block w-full h-[160px] text-sm text-white bg-black  border border-gray-300 focus:ring-blue-500 focus:border-blue-500 border-none outline-none  rounded-b-lg overflow-y-auto">
-                  <p className="mt-2 ml-2">output :</p>
+                <div className="block w-full h-[200px] text-sm text-white bg-black  border border-gray-300 focus:ring-blue-500 focus:border-blue-500 border-none outline-none  rounded-b-lg overflow-y-auto p-3">
                   {
                     output?.map((item,index)=>{
                       return(<>
-                      <div className="mt-3">TestCase {index+1}</div>
+                      <div className="mt-3 flex gap-2 items-center"><p>TestCase {index+1}</p>{item?.success? <MdDone className="text-white text-lg  "/>:<ImCross className="text-white   "/>}</div>
                       <div>Expected output : {item?.expectedOutput}</div>
                       <div>Actual output : {item?.actualOutput}</div>
                       </>)
@@ -157,15 +183,6 @@ Fetchdata()
                 </div>
               </div>
             </div>
-
-            {/* <div className="flex flex-col justify-end items-end">
-              <button
-                type="button"
-                className="text-white font-pop text-lg bg-[#1DBF73] rounded-full p-3 w-[120px]"
-              >
-                Submit
-              </button>
-            </div> */}
           </div>
         </div>
 
@@ -177,21 +194,19 @@ Fetchdata()
     <div>
             <p
             onClick={()=>Changequestion(index)}
-              className={`cursor-pointer block size-8 rounded border border-gray-100 bg-white text-center leading-8 text-gray-900 ${currentindex==index ? 'bg-green-500 text-white':''}`}
+              className={`cursor-pointer block size-8 rounded border border-gray-100  text-center leading-8 text-gray-900 ${currentindex==index ? 'bg-green-500 text-black':''}`}
             >
               {index+1}
             </p>
           </div>
     </>)
   })
-}
-          
-
-         
-
-      
-        </div>
+}        
       </div>
+        <Toaster/>
+      
+      </div>
+      }
     </>
   );
 };

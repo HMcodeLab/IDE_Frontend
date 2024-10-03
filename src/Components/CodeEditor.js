@@ -2,33 +2,40 @@ import React, { useState, useEffect, useRef } from "react";
 import { useCodeMirror } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
-import { dracula } from "@uiw/codemirror-theme-dracula";
+import { java } from "@codemirror/lang-java";
+import { cpp } from "@codemirror/lang-cpp";
 import { autocompletion } from "@codemirror/autocomplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-
+import { dracula } from "@uiw/codemirror-theme-dracula";
+import { FaCirclePause } from "react-icons/fa6";
 const languages = [
   { name: "JavaScript", value: "javascript" },
-  // { name: "Python", value: "python" },
+  { name: "Python", value: "python" },
+  { name: "Java", value: "java" },
+  { name: "C++", value: "cpp" },
 ];
 
-const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
+const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlanguage,language ,show,setshow}) => {
   const [code, setCode] = useState(codesnippet);
-  const [language, setLanguage] = useState("javascript");
-  const [output, setOutput] = useState("");
   const editorRef = useRef();
-
   const onChange = (value) => {
     setCode(value);
-    setcompiledcode(value)
+    setcompiledcode(value);
   };
 
+  // Get the language extension based on the selected language
   const getLanguageExtension = () => {
     switch (language) {
       case "javascript":
         return [javascript(), autocompletion()];
       case "python":
         return [python(), autocompletion()];
+      case "java":
+        return [java(), autocompletion()];
+      
+      case "cpp":
+        return [cpp(), autocompletion()];
       default:
         return [javascript(), autocompletion()];
     }
@@ -36,7 +43,7 @@ const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
 
   const { setContainer, view } = useCodeMirror({
     container: editorRef.current,
-    value: code?.replace(/\\n/g, '\n'), // Convert `\n` to actual newlines
+    value: code?.replace(/\\n/g, "\n"), // Convert `\n` to actual newlines
     extensions: getLanguageExtension(),
     theme: dracula,
     onChange: onChange,
@@ -50,35 +57,31 @@ const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
 
   useEffect(() => {
     if (view) {
-      const defaultCode =
-        language === "javascript"
-          ? codesnippet?.replace(/\\n/g, '\n') // Convert `\n` to newlines
-          : '# Write your Python code here\nprint("Hello, World!")';
+      const defaultCode =codesnippet?.replace(/\\n/g, "\n")
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: defaultCode },
       });
     }
   }, [language, view, codesnippet]);
 
-  const runCode = async() => {
-   
-      setcompiledcode(codesnippet)
-    await Runsampletestcases()
-  
+  const runCode = async () => {
+    setcompiledcode(code);
+    setshow(true)
+    await Runsampletestcases();
+    setshow(false)
   };
 
   return (
-    <div className="editor-container h-full w-full bg-black rounded-lg overflow-hidden">
-      <div className="language-selector flex justify-between items-center mb-4">
+    <div className="editor-container h-full w-full bg-black rounded-lg overflow-y-auto scrollclass">
+      <div className="language-selector flex justify-between items-center p-2 ">
         <select
           value={language}
           onChange={(e) => {
-            setLanguage(e.target.value);
-            setCode(
-              e.target.value === "javascript"
-                ? codesnippet?.replace(/\\n/g, '\n') // Convert `\n` to newlines for JS
-                : '# Write your Python code here\nprint("Hello, World!")'
-            );
+            const selectedLang = e.target.value;
+            console.log(selectedLang);
+            
+            setlanguage(selectedLang);
+            setCode(`# Write your ${selectedLang} code here`);
           }}
           className="ml-2 p-1 rounded"
         >
@@ -90,9 +93,9 @@ const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
         </select>
         <button
           onClick={runCode}
-          className="flex items-center p-2 rounded-lg bg-white mt-2 mr-2 text-black"
+          className="flex items-center p-2 rounded-full h-10 w-10 justify-center bg-white   text-black"
         >
-          <FontAwesomeIcon icon={faPlay} className="" />
+          {!show?<FontAwesomeIcon className="text-xl" icon={faPlay} />:<FaCirclePause className="text-3xl"/>}
         </button>
       </div>
 
@@ -102,8 +105,6 @@ const CodeEditor = ({ codesnippet ,setcompiledcode,Runsampletestcases}) => {
           style={{ height: "300px", border: "1px solid black" }}
         ></div>
       </div>
-
-      
     </div>
   );
 };
