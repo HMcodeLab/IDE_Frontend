@@ -21,7 +21,9 @@ const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlangua
   const editorRef = useRef();
   const onChange = (value) => {
     setCode(value);
-    setcompiledcode(value);
+    setcompiledcode(code);
+
+    // setcompiledcode(value);
   };
 
   // Get the language extension based on the selected language
@@ -91,12 +93,14 @@ const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlangua
             </option>
           ))}
         </select>
-        <button
+      
+       <button
           onClick={runCode}
           className="flex items-center p-2 rounded-full h-10 w-10 justify-center bg-white   text-black"
         >
           {!show?<FontAwesomeIcon className="text-xl" icon={faPlay} />:<FaCirclePause className="text-3xl"/>}
         </button>
+       
       </div>
 
       <div className="editor-section">

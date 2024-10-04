@@ -313,49 +313,7 @@ function enterFullScreen() {
    
   };
 
-  function Nextquestion() {
-    if (index < Length) {
-      // Fetchdata();
-      setdata((prevArr) => {
-        const newArr = [...prevArr]; // Create a shallow copy of the array
-        newArr[index] = { ...newArr[index],isVisited:true }; // Update the specific object
-        localStorage.setItem('data'+localStorage.getItem('assessmenttoken'),JSON.stringify(newArr))
 
-        return newArr; // Set the updated array
-      });
-      localStorage.setItem('lastindex'+localStorage.getItem('assessmenttoken'),index+1)
-if(data[index]?.markForReview || data[index]?.isSubmitted){
-  setSelected(data[index]?.submittedAnswer)
-}
-else{
-  setSelected("");
-
-}
-      setindex((prev)=>prev+1);
-      // navigate(`/question?index=${index + 1}&t=${params.get('t')}`);
-    }
-  }
-
-  function Previousquestion() {
-    if (index >= 1) {
-      setdata((prevArr) => {
-        const newArr = [...prevArr]; // Create a shallow copy of the array
-        newArr[index] = { ...newArr[index],isVisited:true }; // Update the specific object
-        localStorage.setItem('data'+localStorage.getItem('assessmenttoken'),JSON.stringify(newArr))
-        return newArr; // Set the updated array
-      });
-      localStorage.setItem('lastindex'+localStorage.getItem('assessmenttoken'),index-1)
-
-      if(data[index-1]?.markForReview || data[index-1]?.isSubmitted){
-        setSelected(data[index-1]?.submittedAnswer)
-      }
-      else{
-        setSelected("");
-      
-      }
-      setindex((prev)=>prev-1);
-    }
-  }
 
   async function handleClick(status,remarks) {
     // console.log(screenshots);
@@ -491,7 +449,7 @@ useEffect(() => {
     const key = event.key;
     const isFunctionKey = key.startsWith('F') && key.length === 2; // Function keys (F1-F12)
     const isControlKey = event.ctrlKey || event.altKey || event.metaKey || event.shiftKey; // Ctrl, Alt, Cmd, Shift
-console.log(proctoringActive);
+// console.log(proctoringActive);
 
     if ((isFunctionKey || isControlKey) && peoplewarning>0 && showalert && proctoringActive.ControlKeyPressed) {
       event.preventDefault(); // Prevent default behavior
@@ -531,10 +489,10 @@ console.log(proctoringActive);
 
           // enterFullScreen();
         }
-        audio.play().catch(error => console.error('Error playing audio:', error));
+        // audio.play().catch(error => console.error('Error playing audio:', error));
       } else {
         document.title = 'Online Test';
-        audio.pause();
+        // audio.pause();
       }
     };
 
@@ -788,22 +746,7 @@ console.log(proctoringActive);
       }, 'image/jpeg', 0.7);
     });
   };
-  
-  function handleMarkForReview(){
-    setdata((prevArr) => {
-      const newArr = [...prevArr]; // Create a shallow copy of the array
-      newArr[index] = { ...newArr[index],markForReview:true,submittedAnswer:Selected }; // Update the specific object
-      localStorage.setItem('data'+localStorage.getItem('assessmenttoken'),JSON.stringify(newArr))
-      return newArr; // Set the updated array
-    });
-    setSelected("")
-    if(index+1==Length){
-      setindex(0)
-      return;
-    }
-    setindex((prev)=>prev+1);
 
-  }
   function handleReload(){
     // setenablefullscreen(true)
     enterFullScreen()
@@ -845,7 +788,7 @@ let temp=true;
         })
       })
       const response=await tempdata.json()
-      console.log(response);
+      // console.log(response);
       setoutput(response?.results)
       
     } catch (error) {
@@ -879,6 +822,7 @@ let temp=true;
     setcurrentindex(ind)
     setoutput([])
   }
+
   return (
     <>
     <div  onContextMenu={(e)=>e.preventDefault()} className="relative w-full h-screen xsm:h-full mx-auto ">
@@ -931,18 +875,18 @@ let temp=true;
    
         
         
-        <div  className="flex justify-between h-[92vh] overflow-y-hidden xsm:overflow-y-auto xsm:flex-col xsm:gap-5 font-pop xsm:h-auto">
+        <div  className="flex w-full justify-between h-[92vh] overflow-y-hidden xsm:overflow-y-auto xsm:flex-col xsm:gap-5 font-pop xsm:h-auto">
       
       
       <>
-     <div className="">
+     <div className="w-full ">
         {/* <h2 className="bg-[#0F2027] p-10 text-white taext mt-5 font-medium  rounded-2xl font-popping  sm:text-xl md:text-xl lg:text-xl xl:text-[23px]">
           Test Your Knowledge On Full Stack Development
         </h2> */}
-        <div className="grid sm:grid-cols-12 gap-4  bg-white">
+        <div className="grid sm:grid-cols-12 gap-4  bg-white w-full">
           {/* Left Section: 3 Columns */}
         
-          <div className="col-span-12 lg:col-span-4 bg-white p-4">
+          <div className="col-span-12 lg:col-span-4 bg-white p-4 w-full ">
           <div className="fixed top-0 flex items-center justify-center gap-5 cursor-pointer w-fit" >
          <div className="flex items-center" onClick={()=>handleReload()}><SlRefresh />
          <p className="text-sm italic">Reload page if needed</p></div>
@@ -952,7 +896,7 @@ let temp=true;
             <h1 className="font-semibold  py-2  font-montserrat text-[18px]">
               Problem Statement
             </h1>
-            <div className="flex">
+            <div className="flex w-full">
               <p className="text-md font-bold pr-2">{currentindex+1}.</p>
               <div>
                 <ol>
