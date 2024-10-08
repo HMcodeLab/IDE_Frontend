@@ -16,12 +16,15 @@ const languages = [
   { name: "C++", value: "cpp" },
 ];
 
-const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlanguage,language ,show,setshow}) => {
+const CodeEditor = ({Submit, codesnippet, setcompiledcode, Runsampletestcases,setlanguage,language ,show,setshow}) => {
   const [code, setCode] = useState(codesnippet);
+  // console.log("adf");
+  
   const editorRef = useRef();
   const onChange = (value) => {
+
     setCode(value);
-    setcompiledcode(code);
+    setcompiledcode(value);
 
     // setcompiledcode(value);
   };
@@ -67,10 +70,11 @@ const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlangua
   }, [language, view, codesnippet]);
 
   const runCode = async () => {
-    setcompiledcode(code);
-    setshow(true)
+    
+    // setcompiledcode(code);
+    // setshow(true)
     await Runsampletestcases();
-    setshow(false)
+    // setshow(false)
   };
 
   return (
@@ -94,12 +98,16 @@ const CodeEditor = ({ codesnippet, setcompiledcode, Runsampletestcases,setlangua
           ))}
         </select>
       
-       <button
+      <div className="flex justify-center items-center gap-3">
+            <button className="p-2 rounded bg-green-600 text-white hover:bg-green-700 shadow-lg" onClick={Submit}>Submit</button>
+            <button
           onClick={runCode}
           className="flex items-center p-2 rounded-full h-10 w-10 justify-center bg-white   text-black"
         >
           {!show?<FontAwesomeIcon className="text-xl" icon={faPlay} />:<FaCirclePause className="text-3xl"/>}
         </button>
+      </div>
+      
        
       </div>
 

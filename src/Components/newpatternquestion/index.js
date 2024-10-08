@@ -70,6 +70,13 @@ export default function NewQuestion() {
   const [micblocked, setmicblocked] = useState()
   const [showalert, setshowalert] = useState(true)
   const [assessmentname,setassessmentname]=useState()
+  const [allquestions, setallquestions] = useState([])
+  const [currentindex, setcurrentindex] = useState(0)
+  const [testcaseindex, settestcaseindex] = useState(0)
+  const [output, setoutput] = useState([])
+  const [compiledcode, setcompiledcode] = useState('')
+  const [language, setlanguage] = useState('javascript')
+  const [showSpinner, setshowSpinner] = useState(false)
 const [ProctoringScore,setProctoringScore]=useState({
   "mic":0,
   "webcam":0,
@@ -126,6 +133,7 @@ function enterFullScreen() {
 }
 
 
+
   async function Fetchdata() {
     try {
       let url = `${BASE_URL}/getAllAssesmentQuestion`;
@@ -145,18 +153,24 @@ function enterFullScreen() {
     Object.keys(response?.Assessment?.ProctoringFor).forEach(key => {
       newProctoringActive[key] = response?.Assessment?.ProctoringFor[key].inUse;
     });
-// console.log(newProctoringActive);
+console.log(newProctoringActive);
 
     setProctoringActive(newProctoringActive);
     let checkdata=localStorage.getItem('data'+localStorage.getItem('assessmenttoken')) 
     if(checkdata){
       // console.log(checkdata,JSON.parse(checkdata));
-      
+      let parsed=JSON.parse(checkdata)
+    // console.log(parsed);
+    
       setdata(JSON.parse(checkdata))
+      setcompiledcode(parsed?.problems[currentindex]?.problem?.initial_user_func[language]?.initial_code)
     }
     else{
       setdata(response);
       setallquestions(response?.problems)
+      // console.log("starting",response?.problems[currentindex]?.problem?.initial_user_func[language]?.initial_code);
+      
+      setcompiledcode(response?.problems[currentindex]?.problem?.initial_user_func[language]?.initial_code)
     }
         
         setLength(response?.total_problem);
@@ -305,7 +319,6 @@ function enterFullScreen() {
         }
 
         localStorage.setItem('lastindex'+localStorage.getItem('assessmenttoken'),index+1)
-
         setindex((prev)=>prev+1);
        
         // navigate(`/question?index=${index + 1}&t=${params.get('t')}`);
@@ -333,45 +346,45 @@ function enterFullScreen() {
   // console.log(filteredQuestions);
   
     // const filesArray = [];
-    screenshots.forEach((blob, index) => {
-      const file = new File([blob], `screenshot_${index}.jpeg`, { type: 'image/jpeg' });
-      formdata.append('userScreenshots', file);
-    });
-    try {
-      let url = `${BASE_URL}/finishAssessment`;
-      const data = await fetch(url, {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: formdata,
-      });
-      const response = await data.json();
-      if (response.success) {
-        setshow(false)
-        // localStorage.removeItem(localStorage.getItem('assessmenttoken'))
-    // localStorage.clear();
+    // screenshots.forEach((blob, index) => {
+    //   const file = new File([blob], `screenshot_${index}.jpeg`, { type: 'image/jpeg' });
+    //   formdata.append('userScreenshots', file);
+    // });
+    // try {
+    //   let url = `${BASE_URL}/finishAssessment`;
+    //   const data = await fetch(url, {
+    //     method: "PUT",
+    //     headers: {
+    //       Accept: "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: formdata,
+    //   });
+    //   const response = await data.json();
+    //   if (response.success) {
+    //     setshow(false)
+    //     // localStorage.removeItem(localStorage.getItem('assessmenttoken'))
+    // // localStorage.clear();
 
-        if(status){
-          toast.error("Suspended!");
-          localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
-          localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
-          window.location.replace('/suspended');
-        }
-        else{
-          localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
-          localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
-          toast.success("Submitted Successfully");
-          window.location.replace('/submitted');
-        }
+    //     if(status){
+    //       toast.error("Suspended!");
+    //       localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
+    //       localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
+    //       window.location.replace('/suspended');
+    //     }
+    //     else{
+    //       localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
+    //       localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
+    //       toast.success("Submitted Successfully");
+    //       window.location.replace('/submitted');
+    //     }
      
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    //   } else {
+    //     toast.error(response.message);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
 
 
@@ -698,23 +711,7 @@ useEffect(() => {
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
     };
   }, [enablefullscreen]);
-  function handleQuestionNumber(ind){
-    setdata((prevArr) => {
-      const newArr = [...prevArr]; // Create a shallow copy of the array
-      newArr[ind] = { ...newArr[ind],isVisited:true }; // Update the specific object
-      localStorage.setItem('data'+localStorage.getItem('assessmenttoken'),JSON.stringify(newArr))
-      return newArr; // Set the updated array
-    });
-    localStorage.setItem('lastindex'+localStorage.getItem('assessmenttoken'),ind)
 
-    setindex(ind)
-    if(data[ind]?.markForReview || data[ind]?.isSubmitted){
-      setSelected(data[ind]?.submittedAnswer)
-    }
-    else{
-      setSelected("");
-    
-    }  }
 
 
   // Function to capture the screenshot and store it in the state
@@ -752,18 +749,18 @@ useEffect(() => {
     enterFullScreen()
     Fetchdata()
   }
-  const [allquestions, setallquestions] = useState([])
-  const [currentindex, setcurrentindex] = useState(0)
-  const [testcaseindex, settestcaseindex] = useState(0)
-  const [output, setoutput] = useState([])
-  const [compiledcode, setcompiledcode] = useState('')
-  const [language, setlanguage] = useState('javascript')
-  const [showSpinner, setshowSpinner] = useState(false)
+
   const languageWiseApi={
-    'javascript':'runAllTestCaseForJS',
-    'cpp':'runAllCppTestCases',
-    'java':'runAllJavaTestCases',
-    'python':'runAllPythonTestCases',
+    'javascript':'runBaseTestforJS',
+    'cpp':'runBaseTestforCpp',
+    'java':'runBaseTestforJava',
+    'python':'runBaseTestforPython',
+  }
+  const selectedlanguages={
+    'javascript':'JavaScript',
+    'cpp':'C++',
+    'java':'Java',
+    'python':'Python',
   }
   const languageWisePayload={
     'javascript':'jsCode',
@@ -775,28 +772,67 @@ let temp=true;
 
   async function Runsampletestcases(){
     try {
-      // console.log(language);
-      
+      console.log("during run",compiledcode);
+      setshow(true)
+      let token=localStorage.getItem('USER')
       const tempdata=await fetch(BASE_URL+'/'+languageWiseApi[language],{
         method:'POST',
         headers:{
-          'Content-type':'application/json'
+          'Content-type':'application/json',
+          'Authorization':`Bearer ${token}`
         },
         body:JSON.stringify({
-          Id:allquestions[currentindex]?.problem?._id,
-          code:compiledcode
+          problemId:allquestions[currentindex]?.problem?._id,
+          submitted_solution:compiledcode || allquestions[currentindex]?.problem?.initial_user_func[language]?.initial_code
         })
       })
       const response=await tempdata.json()
       // console.log(response);
-      setoutput(response?.results)
+      if(response?.success){
+        setshow(false)
+        setoutput(response?.results)
+
+      }
       
     } catch (error) {
+      console.log(error);
+      
+    }
+  }
+  async function Submit(){
+    try {
+      // console.log("during run",compiledcode);
+      setshow(true)
+      let token=localStorage.getItem('USER')
+      const tempdata=await fetch(BASE_URL+'/submitProblemSolution',{
+        method:'POST',
+        headers:{
+          'Content-type':'application/json',
+          'Authorization':`Bearer ${token}`
+        },
+        body:JSON.stringify({
+          problemId:allquestions[currentindex]?.problem?._id,
+          submitted_solution:compiledcode || allquestions[currentindex]?.problem?.initial_user_func[language]?.initial_code,
+          selected_language:selectedlanguages[language]
+        })
+      })
+      const response=await tempdata.json()
+      // console.log(response);
+      if(response?.success){
+        setshow(false)
+        setoutput(response?.result)
+
+      }
+      
+    } catch (error) {
+      console.log(error);
       
     }
   }
 
+  
   function Changequestion(ind){
+    // setcompiledcode()
     setallquestions((prevData) => {
       const updatedData = [...prevData];
       if (currentindex < updatedData.length) {
@@ -816,11 +852,15 @@ let temp=true;
           problem: updatedProblem,
         };
       }
+      
       return updatedData;
     });
-  
+    
+  // setcompiledcode(allquestions[ind]?.problem?.initial_user_func[language]?.initial_code)
     setcurrentindex(ind)
-    setoutput([])
+    // console.log("change",allquestions[ind]?.problem?.initial_user_func[language]?.initial_code);
+    setcompiledcode(allquestions[ind]?.problem?.initial_user_func[language]?.initial_code)  
+      setoutput([])
   }
 
   return (
@@ -933,7 +973,7 @@ let temp=true;
 
               <div className="flex flex-row basis-1/2grid  pb-0">
                
-                <CodeEditor show={show} setshow={setshow} language={language} setlanguage={setlanguage} Runsampletestcases={Runsampletestcases} setcompiledcode={setcompiledcode} codesnippet={allquestions[currentindex]?.problem?.initial_user_func[language]?.initial_code}/>
+                <CodeEditor show={show} setshow={setshow} language={language} setlanguage={setlanguage} Runsampletestcases={Runsampletestcases} setcompiledcode={setcompiledcode} codesnippet={allquestions[currentindex]?.problem?.initial_user_func[language]?.initial_code} Submit={Submit}/>
               </div>
             </div>
 
