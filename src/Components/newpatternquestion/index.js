@@ -335,56 +335,51 @@ console.log(newProctoringActive);
     formdata.append('isSuspended',status)
     formdata.append('ProctoringScore',JSON.stringify(ProctoringScore))
     formdata.append('remarks',remarks)
-    formdata.append('lastindex',index)
-    const filteredQuestions = data
-  .filter(question => question.isSubmitted) 
-  .map((question, index) => ({
-    index: index + 1,  
-    answer: question.submittedAnswer  
-  }));
-  formdata.append('answers',JSON.stringify(filteredQuestions))
+    formdata.append('submissionTime',timer/60)
+    // formdata.append('lastindex',index)
+
   // console.log(filteredQuestions);
   
-    // const filesArray = [];
-    // screenshots.forEach((blob, index) => {
-    //   const file = new File([blob], `screenshot_${index}.jpeg`, { type: 'image/jpeg' });
-    //   formdata.append('userScreenshots', file);
-    // });
-    // try {
-    //   let url = `${BASE_URL}/finishAssessment`;
-    //   const data = await fetch(url, {
-    //     method: "PUT",
-    //     headers: {
-    //       Accept: "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: formdata,
-    //   });
-    //   const response = await data.json();
-    //   if (response.success) {
-    //     setshow(false)
-    //     // localStorage.removeItem(localStorage.getItem('assessmenttoken'))
-    // // localStorage.clear();
+    const filesArray = [];
+    screenshots.forEach((blob, index) => {
+      const file = new File([blob], `screenshot_${index}.jpeg`, { type: 'image/jpeg' });
+      formdata.append('userScreenshots', file);
+    });
+    try {
+      let url = `${BASE_URL}/finishAssessment`;
+      const data = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: formdata,
+      });
+      const response = await data.json();
+      if (response.success) {
+        setshow(false)
+        // localStorage.removeItem(localStorage.getItem('assessmenttoken'))
+    // localStorage.clear();
 
-    //     if(status){
-    //       toast.error("Suspended!");
-    //       localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
-    //       localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
-    //       window.location.replace('/suspended');
-    //     }
-    //     else{
-    //       localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
-    //       localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
-    //       toast.success("Submitted Successfully");
-    //       window.location.replace('/submitted');
-    //     }
+        if(status){
+          toast.error("Suspended!");
+          localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
+          localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
+          window.location.replace('/suspended');
+        }
+        else{
+          localStorage.setItem('warnings'+localStorage.getItem('assessmenttoken'),3)
+          localStorage.removeItem('screenshots'+localStorage.getItem('assessmenttoken'))
+          toast.success("Submitted Successfully");
+          window.location.replace('/submitted');
+        }
      
-    //   } else {
-    //     toast.error(response.message);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 
@@ -1030,6 +1025,9 @@ let temp=true;
                   }
                 </div>
               </div>
+            </div>
+            <div className="w-full flex justify-end ">
+                  <button onClick={()=>handleClick(false,'')} className="bg-green-600 rounded p-2 text-white">Submit Assessment</button>
             </div>
           </div>
         </div>
